@@ -68,5 +68,6 @@ package-lock.json
 .env
 
 .vscode/
+serverSecret.js
 
 # End of https://www.gitignore.io/api/node

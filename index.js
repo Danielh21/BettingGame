@@ -6,7 +6,36 @@ var hbs  = require('express-hbs');
 var AWS = require('aws-sdk');
 var fs = require('fs')
 var bodyParser = require('body-parser');
+var helmet = require('helmet')
+var passport = require("passport")
+var JWT = require("jsonwebtoken")
+var passportJWT = require('passport-jwt')
+var ExtractJwt = passportJWT.ExtractJwt;
+var Secret = require('./serverSecret').secret // this file is ignored on git!
+var JwtStrategy = passportJWT.Strategy;
 
+var jwtOptions = {}
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
+jwtOptions.secretOrKey = Secret
+
+var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
+    try{
+    console.log('payload received', jwt_payload);
+    userFacade.findUserByName(jwt_payload.userName, function(user){
+        if (user) {
+        next(null, user);
+        } else {
+        next(null, false);
+        }
+      })
+    }
+    catch(exeption){
+        next(null,false)
+    }
+});
+app.use(helmet());
+passport.use(strategy);
+app.use(passport.initialize());
 
 AWS.config.region = process.env.REGION
 
@@ -31,6 +60,8 @@ app.listen(port, function(){
 })
 
 
+app.use(express.static('views'))
+
 app.get("/",function(req,res,next){
     res.render('home')
 })
@@ -39,13 +70,15 @@ app.post("/login",function(req,res,next){
    let username =  req.body.username
    let password = req.body.password
    if(userfacade.authenticateUser(username,password)){
-    res.redirect("/overview")
+    var payload = {username: username}
+    var token = JWT.sign(payload,jwtOptions.secretOrKey)
+    res.json({message: "ok", token : token, goTo: "overview"})
    }
    else{
        res.redirect("/")
    }
 })
 
-app.get("/overview", function(req,res,next){
+app.get("/overview", passport.authenticate('jwt', {session: false}), function(req,res,next){
     res.render('overview')
 })
