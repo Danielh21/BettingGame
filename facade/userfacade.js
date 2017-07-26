@@ -1,13 +1,9 @@
 
- function authenticateUser(username,password){
-    if(username === "daniel") return true
+ function authenticateUser(username,password, callback){
+    if(username === "daniel") return callback({username:"daniel", id: 1})
         else{
-            return false
+            return callback(null)
         }
-}
-
-userfacade = {
-    authenticateUser : authenticateUser
 }
 
 

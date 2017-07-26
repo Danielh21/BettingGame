@@ -3,7 +3,7 @@
             <div class="row">
              <div class="col-md-offset-4 col-md-4">
                 <h2>Login til NFL Spil</h2>
-                <form >
+                <form action="/login" method="POST"  >
                     <div class="form-group" >
                         <label for="username">Username </label>
                         <input name="username" type="text" class="form-control" id="username"
@@ -14,12 +14,12 @@
                     </div>
                     <br>
                     <div class="form-group">
-                        <button onclick="login()" type="button" class="btn btn-success">Login</button>
+                        <button  type="submit" class="btn btn-success">Login</button>
                     </div>
 
                 </form>
              </div>
             </div>
-            <script src="./js/home.js"></script>
+            {{!-- <script src="./js/home.js"></script> --}}
         </body>
 {{> footer}}

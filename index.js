@@ -7,46 +7,29 @@ var AWS = require('aws-sdk');
 var fs = require('fs')
 var bodyParser = require('body-parser');
 var helmet = require('helmet')
-var passport = require("passport")
-var JWT = require("jsonwebtoken")
-var passportJWT = require('passport-jwt')
-var ExtractJwt = passportJWT.ExtractJwt;
+var cookieParser = require("cookie-parser")
 var Secret = require('./serverSecret').secret // this file is ignored on git!
-var JwtStrategy = passportJWT.Strategy;
+var session = require("express-session");
 
-var jwtOptions = {}
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
-jwtOptions.secretOrKey = Secret
 
-var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
-    try{
-    console.log('payload received', jwt_payload);
-    userFacade.findUserByName(jwt_payload.userName, function(user){
-        if (user) {
-        next(null, user);
-        } else {
-        next(null, false);
-        }
-      })
-    }
-    catch(exeption){
-        next(null,false)
-    }
-});
 app.use(helmet());
-passport.use(strategy);
-app.use(passport.initialize());
+
+app.use(express.static('views'))
 
 AWS.config.region = process.env.REGION
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
 
 app.set('view engine', 'hbs')
 
 app.engine('hbs', hbs.express4({
      partialsDir: __dirname + '/views'
 }))
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(session({secret: Secret ,saveUninitialized:true, resave: true}))
+
 
 var header = fs.readFileSync("./views/partial/header.hbs", 'utf8')
 var footer = fs.readFileSync("./views/partial/footer.hbs", "utf8")
@@ -60,7 +43,6 @@ app.listen(port, function(){
 })
 
 
-app.use(express.static('views'))
 
 app.get("/",function(req,res,next){
     res.render('home')
@@ -69,16 +51,29 @@ app.get("/",function(req,res,next){
 app.post("/login",function(req,res,next){
    let username =  req.body.username
    let password = req.body.password
-   if(userfacade.authenticateUser(username,password)){
-    var payload = {username: username}
-    var token = JWT.sign(payload,jwtOptions.secretOrKey)
-    res.json({message: "ok", token : token, goTo: "overview"})
-   }
-   else{
-       res.redirect("/")
-   }
+   userfacade.authenticateUser(username,password, function(user){
+       if(user != null){
+        req.session.username = user.username
+        req.session.userId = user.id
+        res.redirect("/overview")
+       }
+       else{
+           res.redirect("/")
+       }
+   })
 })
 
-app.get("/overview", passport.authenticate('jwt', {session: false}), function(req,res,next){
-    res.render('overview')
+
+app.use(function( req , res , next ) {
+var sess = req.session
+if(sess.username != null){
+  next();
+}
+ else{
+     res.redirect("/")
+ }
+});
+
+app.get("/overview", function(req,res,next){
+    res.render('overview', { username : req.session.username})
 })
