@@ -10,6 +10,7 @@ var helmet = require('helmet')
 var cookieParser = require("cookie-parser")
 var Secret = require('./serverSecret').secret // this file is ignored on git!
 var session = require("express-session");
+var nflRouter  = require('./routes/nflgameroute')
 
 
 app.use(helmet());
@@ -45,7 +46,11 @@ app.listen(port, function(){
 
 
 app.get("/",function(req,res,next){
-    res.render('home')
+    res.render('index')
+})
+
+app.get("/nflgame", function(req,res,next){
+    res.render("nflgame")
 })
 
 app.post("/login",function(req,res,next){
@@ -58,7 +63,7 @@ app.post("/login",function(req,res,next){
         res.redirect("/overview")
        }
        else{
-           res.redirect("/")
+           res.redirect("/nflgame")
        }
    })
 })
@@ -70,10 +75,8 @@ if(sess.username != null){
   next();
 }
  else{
-     res.redirect("/")
+     res.redirect("/nflgame")
  }
 });
 
-app.get("/overview", function(req,res,next){
-    res.render('overview', { username : req.session.username})
-})
+app.use("/", nflRouter)

@@ -1,6 +1,33 @@
- {{> header }}
-<h3>Velkommen til Overblik</h3>
+ {{> header this }}
+    <div class="row">
+        <div class="col-md-4">
+        <h3>Velkommen til Overblik siden</h3>
+        </div>
+    </div>
+    <div class="row">
+    <div class="col-md-6 col-md-offset-3">
 
-Dit Bruger navn er {{username}}
+        <table class="table" id="score">
+            <thead>
+                <tr>
+                    <th>Brugere</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each users}}
+                <tr>
+                    <td> <a href="/singlepage/{{this.userid}}"> <span style="color: blue"> {{this.username}} </span> </a></td>
+                    <td>{{this.points}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
 
+    <a type="button" class="btn btn-success" href="/betgames">Ugens Kamp </a>
+    <a type="button" class="btn btn-warning" href="/divisionwinners">Divisions vindere </a>
+    </div>
+
+
+    </div>
 {{> footer}}

@@ -9,7 +9,6 @@ var gamebets = [
     userId: 1,
     gameId: 2,
     hometeamWin: false,
-
 },
 {
     userId: 2,

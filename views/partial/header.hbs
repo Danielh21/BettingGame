@@ -4,6 +4,9 @@
          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
          <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </head>
-<div>
-    <h3>Hello I am Header!</h3>
-</div>
+<body class="container">
+    {{#if username}}
+    <h4>Logget ind som {{username}}</h4>
+    {{else}}
+    <h4>Not Logged in</h4>
+    {{/if}}
