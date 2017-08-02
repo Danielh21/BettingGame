@@ -10,16 +10,30 @@ router.get("/overview", function(req,res,next){
     })
 })
 
-router.get("/betgames", function(req,res,next){
-    var userid =  req.session.userid
-    res.render("betgames", {username:req.session.username,
-                                   userid: userid})
-})
-
 router.get("/divisionwinners", function(req,res,next){
     var userid =  req.session.userid
     res.render("divisionwinners", {username:req.session.username,
                                    userid: userid})
+})
+
+router.get("/gamesoftheweek", function(req,res,next){
+    gamefacade.getGamesOfTheWeek(function(err,games){
+        if(err != null) next();
+        
+        res.render("gamesoftheweek", {username: req.session.username,
+                                      userId : req.session.userId, 
+                                      games : games})
+    })
+})
+
+router.post("/gamesoftheweek", function(req,res,next){
+    var bets = req.body.bets
+    var userId = req.session.userId
+    gamefacade.postGameBets(bets,userId, function(err,succes){
+       if(err != null) next();
+        res.json({succes : succes, userId: userId})
+    })
+
 })
 
 router.get("/singlepage/:id", function(req,res,next){

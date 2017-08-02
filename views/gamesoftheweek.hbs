@@ -1,0 +1,36 @@
+{{> header this }}
+<div class="row col-md-offset-2">
+
+    <h3>Ugens Kamp(e)</h3>
+
+        <table class="table">
+            <thead>
+                <th>Hjemme hold</th>
+                <th>Ude Hold</th>
+                <th>Dato</th>
+                <th>Dit Bud</th>
+            </thead>
+            <tbody>
+                {{#each games}}
+                <tr>
+                    <td>{{this.homeTeam}}</td>
+                    <td>{{this.awayTeam}}</td>
+                    <td>{{this.date}}</td>
+                    <td> <select name="game" id={{this.id}}>
+                        <option>{{this.homeTeam}}</option>
+                        <option>{{this.awayTeam}}</option>
+                        </select> 
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <button id="submitResualts" onclick=submitClicked() type="button" class="btn btn-default">Indsend</button>
+        <a href="/overview"> <button class="btn btn-danger">Tilbage</button></a>
+
+</div>
+
+<script src="./js/gameoftheweek.js"></script>
+
+{{> footer}}
